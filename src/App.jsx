@@ -1,12 +1,12 @@
-import { useState } from "react";
+import React from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-// import { supabase } from "./supabaseClient";
+import { supabase } from "./supabaseClient";
 import Home from "./pages/Home";
-// import ResumeBuilder from "./pages/ResumeBuilder";
-// import CoverLetterBuilder from "./pages/CoverLetterBuilder";
-// import Auth from "./pages/Auth";
-// import Dashboard from "./pages/Dashboard";
+import ResumeBuilder from "./pages/ResumeBuilder";
+import CoverLetterBuilder from "./pages/CoverLetterBuilder";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -26,13 +26,13 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Home session={session} />} />
-      {/* <Route path="/auth" element={<Auth />} />
+      <Route path="/auth" element={<Auth />} />
       <Route path="/resume" element={<ResumeBuilder session={session} />} />
       <Route
         path="/cover-letter"
         element={<CoverLetterBuilder session={session} />}
       />
-      <Route path="/dashboard" element={<Dashboard session={session} />} /> */}
+      <Route path="/dashboard" element={<Dashboard session={session} />} />
     </Routes>
   );
 }
