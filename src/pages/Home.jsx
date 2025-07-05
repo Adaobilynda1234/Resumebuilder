@@ -170,7 +170,7 @@ function Home({ session }) {
               },
               {
                 title: "Enterprise",
-                price: "Contact Us",
+                price: "₦20,000/mo",
                 features: [
                   "Unlimited Everything",
                   "Custom Branding",
