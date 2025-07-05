@@ -19,9 +19,13 @@ function ResumeBuilder({ session }) {
   });
   const [aiPrompt, setAiPrompt] = useState("");
   const [resumeCount, setResumeCount] = useState(0);
+  const [userPlan, setUserPlan] = useState("Free");
 
   useEffect(() => {
-    if (session) fetchResumeCount();
+    if (session) {
+      fetchResumeCount();
+      checkSubscription();
+    }
   }, [session]);
 
   const fetchResumeCount = async () => {
@@ -30,6 +34,17 @@ function ResumeBuilder({ session }) {
       .select("id")
       .eq("user_id", session.user.id);
     setResumeCount(data.length);
+  };
+
+  const checkSubscription = async () => {
+    const { data } = await supabase
+      .from("subscriptions")
+      .select("plan")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const plan = data.length > 0 ? data[0].plan : "Free";
+    setUserPlan(plan);
   };
 
   const handleAIEnhance = async (sectionId) => {
@@ -62,8 +77,9 @@ function ResumeBuilder({ session }) {
   };
 
   const saveResume = async () => {
-    if (resumeCount >= 2) {
-      alert("Upgrade to Pro for more resumes!");
+    if (userPlan === "Free" && resumeCount >= 2) {
+      alert("Upgrade to Pro or Enterprise for more resumes!");
+      window.location.href = "/checkout/pro";
       return;
     }
     await supabase.from("resumes").insert({

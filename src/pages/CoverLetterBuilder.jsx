@@ -13,9 +13,13 @@ function CoverLetterBuilder({ session }) {
   });
   const [aiPrompt, setAiPrompt] = useState("");
   const [coverLetterCount, setCoverLetterCount] = useState(0);
+  const [userPlan, setUserPlan] = useState("Free");
 
   useEffect(() => {
-    if (session) fetchCoverLetterCount();
+    if (session) {
+      fetchCoverLetterCount();
+      checkSubscription();
+    }
   }, [session]);
 
   const fetchCoverLetterCount = async () => {
@@ -24,6 +28,17 @@ function CoverLetterBuilder({ session }) {
       .select("id")
       .eq("user_id", session.user.id);
     setCoverLetterCount(data.length);
+  };
+
+  const checkSubscription = async () => {
+    const { data } = await supabase
+      .from("subscriptions")
+      .select("plan")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const plan = data.length > 0 ? data[0].plan : "Free";
+    setUserPlan(plan);
   };
 
   const handleAIEnhance = async () => {
@@ -52,8 +67,9 @@ function CoverLetterBuilder({ session }) {
   };
 
   const saveCoverLetter = async () => {
-    if (coverLetterCount >= 1) {
-      alert("Upgrade to Pro for more cover letters!");
+    if (userPlan === "Free" && coverLetterCount >= 1) {
+      alert("Upgrade to Pro or Enterprise for more cover letters!");
+      window.location.href = "/checkout/pro";
       return;
     }
     await supabase.from("cover_letters").insert({
@@ -117,7 +133,8 @@ function CoverLetterBuilder({ session }) {
           />
           <button
             onClick={handleAIEnhance}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-blue-600 text-white Anno Dominiwhiteទ0
+            -white px-4 py-2 rounded"
           >
             Enhance with AI
           </button>

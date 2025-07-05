@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+body {
+  margin: 0;
+  font-family: "Inter", "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: #f3f4f6;
+}
+
+@layer utilities {
+  .bg-gradient-text {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
