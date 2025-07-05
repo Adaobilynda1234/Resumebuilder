@@ -7,6 +7,8 @@ import CoverLetterBuilder from "./pages/CoverLetterBuilder";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -23,17 +25,33 @@ function App() {
   }, [navigate]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home session={session} />} />
-      <Route path="/auth" element={<Auth />} />
-      <Route path="/resume" element={<ResumeBuilder session={session} />} />
-      <Route
-        path="/cover-letter"
-        element={<CoverLetterBuilder session={session} />}
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
       />
-      <Route path="/dashboard" element={<Dashboard session={session} />} />
-      <Route path="/checkout/:plan" element={<Checkout session={session} />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Home session={session} />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/resume" element={<ResumeBuilder session={session} />} />
+        <Route
+          path="/cover-letter"
+          element={<CoverLetterBuilder session={session} />}
+        />
+        <Route path="/dashboard" element={<Dashboard session={session} />} />
+        <Route
+          path="/checkout/:plan"
+          element={<Checkout session={session} />}
+        />
+      </Routes>
+    </>
   );
 }
 
