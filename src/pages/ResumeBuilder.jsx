@@ -20,9 +20,132 @@ import {
   Palette,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
 import { supabase } from "../supabaseClient";
+import {
+  PDFDownloadLink,
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+} from "@react-pdf/renderer";
+
+// Register fonts for PDF
+Font.register({
+  family: "Roboto",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf",
+      fontWeight: 400,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/roboto/v30/KFOlCnqEu92Fr1MmEU9fBBc9.ttf",
+      fontWeight: 700,
+    },
+  ],
+});
+
+// PDF Styles
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "column",
+    backgroundColor: "#ffffff",
+    padding: 40,
+    fontFamily: "Roboto",
+  },
+  section: {
+    marginBottom: 20,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  name: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 10,
+    color: "#444444",
+  },
+  contact: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 15,
+  },
+  contactItem: {
+    fontSize: 10,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#cccccc",
+    marginVertical: 10,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
+    color: "#222222",
+  },
+  content: {
+    fontSize: 11,
+    lineHeight: 1.5,
+  },
+  summary: {
+    marginBottom: 15,
+    fontSize: 11,
+    lineHeight: 1.5,
+  },
+});
+
+// PDF Document Component
+const ResumePDF = ({ resume, template }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Header Section */}
+      <View style={[styles.header, { backgroundColor: template.hexPrimary }]}>
+        <Text style={[styles.name, { color: "#ffffff" }]}>
+          {resume.name || "Your Name"}
+        </Text>
+        <Text style={[styles.title, { color: "#ffffff" }]}>
+          {resume.title || "Professional Title"}
+        </Text>
+      </View>
+
+      {/* Contact Information */}
+      <View style={styles.contact}>
+        <Text style={styles.contactItem}>
+          {resume.email || "email@example.com"}
+        </Text>
+        <Text style={styles.contactItem}>{resume.phone || "123-456-7890"}</Text>
+        {resume.location && (
+          <Text style={styles.contactItem}>{resume.location}</Text>
+        )}
+      </View>
+
+      {/* Summary */}
+      {resume.summary && (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Professional Summary</Text>
+          <Text style={styles.summary}>{resume.summary}</Text>
+        </View>
+      )}
+
+      {/* Sections */}
+      {resume.sections.map((section) => (
+        <View key={section.id} style={styles.section}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          <Text style={styles.content}>
+            {section.content || "No content added yet"}
+          </Text>
+        </View>
+      ))}
+    </Page>
+  </Document>
+);
 
 function ResumeBuilder({ session }) {
   const [resume, setResume] = useState({
@@ -33,17 +156,41 @@ function ResumeBuilder({ session }) {
     title: "",
     summary: "",
     sections: [
-      { id: "1", title: "Education", content: "", icon: GraduationCap },
-      { id: "2", title: "Experience", content: "", icon: Briefcase },
-      { id: "3", title: "Skills", content: "", icon: Code },
-      { id: "4", title: "Achievements", content: "", icon: Award },
+      {
+        id: "1",
+        title: "Education",
+        content: "",
+        icon: GraduationCap,
+        aiPrompt: "",
+      },
+      {
+        id: "2",
+        title: "Experience",
+        content: "",
+        icon: Briefcase,
+        aiPrompt: "",
+      },
+      {
+        id: "3",
+        title: "Skills",
+        content: "",
+        icon: Code,
+        aiPrompt: "",
+      },
+      {
+        id: "4",
+        title: "Achievements",
+        content: "",
+        icon: Award,
+        aiPrompt: "",
+      },
     ],
   });
-  const [aiPrompt, setAiPrompt] = useState("");
   const [resumeCount, setResumeCount] = useState(0);
   const [userPlan, setUserPlan] = useState("Free");
   const [selectedTemplate, setSelectedTemplate] = useState("modern");
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const templates = {
     modern: {
@@ -92,7 +239,7 @@ function ResumeBuilder({ session }) {
       .from("resumes")
       .select("id")
       .eq("user_id", session.user.id);
-    setResumeCount(data.length);
+    setResumeCount(data?.length || 0);
   };
 
   const checkSubscription = async () => {
@@ -102,26 +249,59 @@ function ResumeBuilder({ session }) {
       .eq("user_id", session.user.id)
       .order("created_at", { ascending: false })
       .limit(1);
-    const plan = data.length > 0 ? data[0].plan : "Free";
+    const plan = data?.length > 0 ? data[0].plan : "Free";
     setUserPlan(plan);
   };
 
   const handleAIEnhance = async (sectionId) => {
-    if (!aiPrompt) {
+    const section = resume.sections.find((sec) => sec.id === sectionId);
+
+    if (!section.aiPrompt.trim()) {
       toast.error("Please enter an AI enhancement prompt");
       return;
     }
 
-    // Mock AI enhancement (replace with actual API call in production)
-    const enhancedContent = `Enhanced content for ${aiPrompt}:\n\n• Leveraged advanced ${aiPrompt} techniques to improve performance by 40%\n• Collaborated with cross-functional teams to deliver innovative solutions\n• Demonstrated expertise in ${aiPrompt} through successful project delivery\n• Maintained high standards of quality and attention to detail`;
+    // Enhanced AI generation with section-specific content
+    let enhancedContent = "";
+    const prompt = section.aiPrompt.trim();
+
+    switch (section.title.toLowerCase()) {
+      case "education":
+        enhancedContent = `• ${prompt} with honors\n• Relevant coursework: Advanced ${
+          prompt.split(" ")[0] || "Subjects"
+        }\n• GPA: 3.8/4.0\n• Thesis: "Advanced Techniques in ${prompt}"`;
+        break;
+      case "experience":
+        enhancedContent = `• ${prompt} - Developed and implemented new strategies\n• Managed team of 5 ${
+          prompt.split(" ")[0] || "specialists"
+        }\n• Increased efficiency by 25% through ${prompt}`;
+        break;
+      case "skills":
+        enhancedContent = `• ${prompt}\n• ${
+          prompt.split(" ")[0] || "Advanced"
+        } Frameworks\n• ${
+          prompt.split(" ")[0] || "Industry"
+        } Best Practices\n• ${
+          prompt.split(" ")[0] || "Technical"
+        } Problem Solving`;
+        break;
+      case "achievements":
+        enhancedContent = `• Awarded for excellence in ${prompt}\n• Published research on ${prompt}\n• Led successful ${
+          prompt.split(" ")[0] || "project"
+        } initiative\n• Recognized as top performer in ${prompt}`;
+        break;
+      default:
+        enhancedContent = `• Leveraged advanced ${prompt} techniques\n• Achieved measurable results in ${prompt}\n• Developed innovative solutions for ${prompt}`;
+    }
 
     setResume((prev) => ({
       ...prev,
       sections: prev.sections.map((sec) =>
-        sec.id === sectionId ? { ...sec, content: enhancedContent } : sec
+        sec.id === sectionId
+          ? { ...sec, content: enhancedContent, aiPrompt: "" }
+          : sec
       ),
     }));
-    setAiPrompt("");
     toast.success("Section enhanced successfully!");
   };
 
@@ -131,6 +311,7 @@ function ResumeBuilder({ session }) {
       title: "New Section",
       content: "",
       icon: Plus,
+      aiPrompt: "",
     };
     setResume((prev) => ({
       ...prev,
@@ -168,154 +349,6 @@ function ResumeBuilder({ session }) {
     });
     toast.success("Resume saved successfully!");
     fetchResumeCount();
-  };
-
-  const exportPDF = async () => {
-    const element = document.getElementById("resume-preview");
-    if (!element) {
-      toast.error("Error generating PDF");
-      return;
-    }
-
-    try {
-      // Clone the preview element to avoid modifying the original DOM
-      const tempContainer = element.cloneNode(true);
-      // Set explicit dimensions to match A4 size (210mm x 297mm at 96 DPI)
-      tempContainer.style.width = "794px";
-      tempContainer.style.height = "1123px";
-      tempContainer.style.transform = "none"; // Remove scale-90
-      tempContainer.style.overflow = "hidden";
-      tempContainer.style.fontFamily = "Arial, sans-serif"; // Fallback font
-
-      // Append a custom stylesheet to map Tailwind classes to HEX colors
-      const style = document.createElement("style");
-      style.textContent = `
-        .bg-blue-600 { background-color: #2563eb !important; }
-        .bg-blue-100 { background-color: #dbeafe !important; }
-        .bg-purple-600 { background-color: #7c3aed !important; }
-        .bg-purple-100 { background-color: #ede9fe !important; }
-        .bg-gray-800 { background-color: #1f2937 !important; }
-        .bg-gray-100 { background-color: #f3f4f6 !important; }
-        .bg-pink-500 { background-color: #ec4899 !important; }
-        .bg-orange-100 { background-color: #ffedd5 !important; }
-        .text-gray-800 { color: #1f2937 !important; }
-        .text-gray-700 { color: #374151 !important; }
-        .text-gray-600 { color: #4b5563 !important; }
-        .text-white { color: #ffffff !important; }
-        .border-gray-200 { border-color: #e5e7eb !important; }
-        .bg-gradient-to-r, .bg-gradient-to-br { background: none !important; }
-        .bg-white { background-color: #ffffff !important; }
-        .border-none { border: none !important; }
-        .rounded-lg { border-radius: 8px !important; }
-        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important; }
-        .p-4 { padding: 16px !important; }
-        .p-6 { padding: 24px !important; }
-        .p-8 { padding: 32px !important; }
-        .mb-2 { margin-bottom: 8px !important; }
-        .mb-3 { margin-bottom: 12px !important; }
-        .mb-4 { margin-bottom: 16px !important; }
-        .mb-6 { margin-bottom: 24px !important; }
-        .mb-8 { margin-bottom: 32px !important; }
-        .text-xl { font-size: 20px !important; }
-        .text-2xl { font-size: 24px !important; }
-        .text-3xl { font-size: 30px !important; }
-        .text-4xl { font-size: 36px !important; }
-        .text-base { font-size: 16px !important; }
-        .text-sm { font-size: 14px !important; }
-        .text-xs { font-size: 12px !important; }
-        .font-bold { font-weight: 700 !important; }
-        .font-semibold { font-weight: 600 !important; }
-        .font-light { font-weight: 300 !important; }
-        .flex { display: flex !important; }
-        .flex-wrap { flex-wrap: wrap !important; }
-        .gap-1 { gap: 4px !important; }
-        .gap-2 { gap: 8px !important; }
-        .gap-3 { gap: 12px !important; }
-        .gap-4 { gap: 16px !important; }
-        .items-center { align-items: center !important; }
-        .justify-center { justify-content: center !important; }
-        .text-center { text-align: center !important; }
-        .italic { font-style: italic !important; }
-        .leading-relaxed { line-height: 1.625 !important; }
-        .whitespace-pre-line { white-space: pre-line !important; }
-        * { font-family: Arial, sans-serif !important; }
-      `;
-      tempContainer.appendChild(style);
-
-      // Replace Tailwind classes with inline styles for compatibility
-      const elementsWithClasses = tempContainer.querySelectorAll("[class]");
-      elementsWithClasses.forEach((el) => {
-        if (
-          el.nodeType !== Node.ELEMENT_NODE ||
-          !el.className ||
-          typeof el.className !== "string"
-        ) {
-          return;
-        }
-        const classes = el.className.split(" ");
-        classes.forEach((cls) => {
-          if (cls.startsWith("bg-") && templates[selectedTemplate][cls]) {
-            el.style.backgroundColor =
-              templates[selectedTemplate][cls.replace("bg-", "hex")];
-          }
-          if (cls.startsWith("text-")) {
-            el.style.color = cls.includes("white") ? "#ffffff" : "#1f2937";
-          }
-          if (cls.startsWith("border-")) {
-            el.style.borderColor = "#e5e7eb";
-            el.style.borderWidth = "1px";
-            el.style.borderStyle = "solid";
-          }
-          if (cls.includes("rounded-lg")) {
-            el.style.borderRadius = "8px";
-          }
-          if (cls.includes("shadow-lg")) {
-            el.style.boxShadow =
-              "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)";
-          }
-        });
-      });
-
-      // Handle Lucide icons by converting SVGs to images
-      const svgs = tempContainer.querySelectorAll("svg");
-      svgs.forEach((svg) => {
-        const svgData = new XMLSerializer().serializeToString(svg);
-        const img = document.createElement("img");
-        img.src = `data:image/svg+xml;base64,${btoa(svgData)}`;
-        img.style.width = svg.getAttribute("width") || "18px";
-        img.style.height = svg.getAttribute("height") || "18px";
-        svg.parentNode.replaceChild(img, svg);
-      });
-
-      document.body.appendChild(tempContainer);
-
-      const canvas = await html2canvas(tempContainer, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        width: 794,
-        height: 1123,
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("resume.pdf");
-      toast.success("Resume exported as PDF!");
-
-      document.body.removeChild(tempContainer);
-    } catch (error) {
-      toast.error("Error exporting PDF");
-      console.error(error);
-    }
   };
 
   const onDragEnd = (result) => {
@@ -689,10 +722,20 @@ function ResumeBuilder({ session }) {
                                       <input
                                         type="text"
                                         placeholder="Describe what you want to enhance..."
-                                        value={aiPrompt}
-                                        onChange={(e) =>
-                                          setAiPrompt(e.target.value)
-                                        }
+                                        value={section.aiPrompt}
+                                        onChange={(e) => {
+                                          setResume((prev) => ({
+                                            ...prev,
+                                            sections: prev.sections.map((sec) =>
+                                              sec.id === section.id
+                                                ? {
+                                                    ...sec,
+                                                    aiPrompt: e.target.value,
+                                                  }
+                                                : sec
+                                            ),
+                                          }));
+                                        }}
                                         className="flex-1 p-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
                                       />
                                       <button
@@ -700,7 +743,6 @@ function ResumeBuilder({ session }) {
                                           handleAIEnhance(section.id)
                                         }
                                         className="px-3 sm:px-4 py-1.5 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-                                        style={{ backgroundColor: "#7c3aed" }}
                                       >
                                         Enhance
                                       </button>
@@ -725,13 +767,28 @@ function ResumeBuilder({ session }) {
                     <Save size={16} />
                     Save Resume
                   </button>
-                  <button
-                    onClick={exportPDF}
+
+                  <PDFDownloadLink
+                    document={
+                      <ResumePDF
+                        resume={resume}
+                        template={templates[selectedTemplate]}
+                      />
+                    }
+                    fileName="resume.pdf"
                     className="flex-1 bg-purple-600 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg hover:bg-purple-700 transition-colors font-medium flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
-                    <Download size={16} />
-                    Export PDF
-                  </button>
+                    {({ loading }) =>
+                      loading ? (
+                        "Generating PDF..."
+                      ) : (
+                        <>
+                          <Download size={16} />
+                          Export PDF
+                        </>
+                      )
+                    }
+                  </PDFDownloadLink>
                 </div>
               </motion.div>
             ) : null}
