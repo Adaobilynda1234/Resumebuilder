@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Checkout from "./pages/Checkout";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import JobTemplate from "./pages/JobTemplate";
 
 function App() {
   const [session, setSession] = useState(null);
@@ -41,6 +42,10 @@ function App() {
         <Route path="/" element={<Home session={session} />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/resume" element={<ResumeBuilder session={session} />} />
+        <Route
+          path="/job-template"
+          element={<JobTemplate session={session} />}
+        />
         <Route
           path="/cover-letter"
           element={<CoverLetterBuilder session={session} />}

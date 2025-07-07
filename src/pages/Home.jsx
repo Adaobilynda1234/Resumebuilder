@@ -56,32 +56,39 @@ function Home({ session }) {
       </header>
 
       {/* Hero Section */}
+
       <motion.section
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="max-w-7xl mx-auto py-20 px-4 sm:px-6 lg:px-8 text-center relative z-10"
       >
-        <h2 className="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
           Create Standout Resumes & Cover Letters
         </h2>
-        <p className="mt-6 text-xl text-gray-700 max-w-3xl mx-auto">
+        <p className="mt-6 text-lg md:text-xl text-gray-700 max-w-3xl mx-auto">
           Build professional, ATS-optimized documents with AI-powered tools
           tailored for the Nigerian job market. Get hired faster with
           ResumeCraft.
         </p>
-        <div className="mt-10 flex justify-center gap-6">
+        <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             to={session ? "/resume" : "/auth"}
-            className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition transform hover:scale-105"
+            className="inline-flex items-center px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition transform hover:scale-105"
           >
             <FaFileAlt className="mr-3" /> Build Resume
           </Link>
           <Link
             to={session ? "/cover-letter" : "/auth"}
-            className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-full text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50 transition transform hover:scale-105"
+            className="inline-flex items-center px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-full text-indigo-600 bg-white border-2 border-indigo-600 hover:bg-indigo-50 transition transform hover:scale-105"
           >
             <FaEnvelope className="mr-3" /> Build Cover Letter
+          </Link>
+          <Link
+            to="/job-template"
+            className="inline-flex items-center px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-semibold rounded-full text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 transition transform hover:scale-105"
+          >
+            <FaDownload className="mr-3" /> Job Templates
           </Link>
         </div>
       </motion.section>
