@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { FaFileAlt, FaEnvelope, FaStar } from "react-icons/fa";
+import { FaFileAlt, FaEnvelope, FaStar, FaDownload } from "react-icons/fa";
 
 function Home({ session }) {
   return (
@@ -39,7 +39,7 @@ function Home({ session }) {
               <>
                 <Link
                   to="/auth"
-                  className="text-indigo-600 hover:text-indigo-800 font-medium transition"
+                  className="text-indigo-600 px-4 py-2 rounded-full hover:text-indigo-800 font-medium transition"
                 >
                   Login
                 </Link>
@@ -93,7 +93,7 @@ function Home({ session }) {
         </h3>
         <p className="mt-4 text-lg text-gray-700 text-center max-w-3xl mx-auto">
           Our platform empowers Nigerian professionals with tools to succeed in
-          today’s competitive job market.
+          today's competitive job market.
         </p>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
@@ -108,9 +108,9 @@ function Home({ session }) {
               icon: FaFileAlt,
             },
             {
-              title: "Secure Storage",
-              desc: "Safely store your documents with Supabase.",
-              icon: FaEnvelope,
+              title: "Job Search Templates",
+              desc: "Downloadable templates to organize your job search.",
+              icon: FaDownload, // Changed icon and description
             },
           ].map((feature, index) => (
             <motion.div
