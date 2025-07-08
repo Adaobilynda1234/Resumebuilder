@@ -19,20 +19,21 @@ function Auth() {
 
     try {
       if (isSignUp) {
-        // First check if user already exists
-        const { data: existingUsers, error: existingUserError } = await supabase
-          .from("profiles")
-          .select("id")
-          .eq("email", email);
+        // First, try to sign in with the credentials to check if user exists
+        const { data: existingUserData, error: existingUserError } =
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
 
-        if (existingUsers && existingUsers.length > 0) {
+        if (existingUserData.user) {
+          // User exists and password is correct - they should login instead
           setError("This email is already registered. Please login instead.");
           toast.error("Email already registered!");
-          setIsLoading(false);
           return;
         }
 
-        // Proceed with signup
+        // If sign-in failed, proceed with signup
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
@@ -43,16 +44,36 @@ function Auth() {
 
         if (signUpError) {
           // Handle specific Supabase error codes
-          if (signUpError.status === 400 || signUpError.status === 409) {
+          if (
+            signUpError.message === "User already registered" ||
+            signUpError.message?.includes("email_exists") ||
+            signUpError.code === "email_exists" ||
+            signUpError.message?.includes("already registered")
+          ) {
             setError("This email is already registered. Please login instead.");
             toast.error("Email already registered!");
+          } else if (signUpError.message?.includes("Invalid email")) {
+            setError("Please enter a valid email address.");
+            toast.error("Invalid email address!");
+          } else if (signUpError.message?.includes("Password")) {
+            setError("Password must be at least 6 characters long.");
+            toast.error("Password too weak!");
           } else {
-            throw signUpError;
+            setError(
+              signUpError.message || "Sign up failed. Please try again."
+            );
+            toast.error(signUpError.message || "Sign up failed!");
           }
-        } else {
+        } else if (data.user) {
+          // Success - new user created
           toast.success(
             "Sign up successful! Check your email for verification."
           );
+          setEmail("");
+          setPassword("");
+        } else {
+          setError("Sign up failed. Please try again.");
+          toast.error("Sign up failed!");
         }
       } else {
         // Login flow
@@ -62,10 +83,24 @@ function Auth() {
             password,
           });
 
-        if (signInError) throw signInError;
-
-        toast.success("Login successful!");
-        navigate("/dashboard");
+        if (signInError) {
+          // Handle specific login errors
+          if (signInError.message?.includes("Invalid login credentials")) {
+            setError(
+              "Invalid email or password. Please check your credentials."
+            );
+            toast.error("Invalid login credentials!");
+          } else if (signInError.message?.includes("Email not confirmed")) {
+            setError("Please check your email and confirm your account first.");
+            toast.error("Email not confirmed!");
+          } else {
+            setError(signInError.message || "Login failed. Please try again.");
+            toast.error(signInError.message || "Login failed!");
+          }
+        } else {
+          toast.success("Login successful!");
+          navigate("/dashboard");
+        }
       }
     } catch (error) {
       console.error("Auth error:", error);
@@ -173,6 +208,8 @@ function Auth() {
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError(null);
+              setEmail("");
+              setPassword("");
             }}
             className="text-blue-600 hover:underline font-medium ml-1"
           >
