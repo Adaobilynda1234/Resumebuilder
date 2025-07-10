@@ -1,8 +1,23 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { FaFileAlt, FaEnvelope, FaStar, FaDownload } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaEnvelope,
+  FaStar,
+  FaDownload,
+  FaTwitter,
+  FaLinkedin,
+  FaGithub,
+} from "react-icons/fa";
+import { useState } from "react";
 
 function Home({ session }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 relative overflow-hidden">
       {/* Hero Background */}
@@ -10,7 +25,7 @@ function Home({ session }) {
         className="absolute inset-0 bg-cover bg-center opacity-10"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1516321310764-8a5b5c3e73f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
+            "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')",
         }}
         initial={{ scale: 1.2 }}
         animate={{ scale: 1 }}
@@ -27,7 +42,8 @@ function Home({ session }) {
           <h1 className="text-3xl font-extrabold text-indigo-600 tracking-tight">
             ResumeCraft
           </h1>
-          <div className="space-x-4">
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-4">
             {session ? (
               <Link
                 to="/dashboard"
@@ -52,11 +68,71 @@ function Home({ session }) {
               </>
             )}
           </div>
+          {/* Mobile Hamburger Button */}
+          <button
+            className="md:hidden text-indigo-600 focus:outline-none"
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <svg
+              className="w-8 h-8"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d={
+                  isMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
         </div>
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="md:hidden bg-white px-4 pt-2 pb-4"
+          >
+            {session ? (
+              <Link
+                to="/dashboard"
+                className="block text-indigo-600 hover:text-indigo-800 font-medium py-2"
+                onClick={toggleMenu}
+              >
+                Dashboard
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="block text-indigo-600 hover:text-indigo-800 font-medium py-2"
+                  onClick={toggleMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/auth"
+                  className="block bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 mt-2"
+                  onClick={toggleMenu}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </motion.div>
+        )}
       </header>
 
       {/* Hero Section */}
-
       <motion.section
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
@@ -117,7 +193,7 @@ function Home({ session }) {
             {
               title: "Job Search Templates",
               desc: "Downloadable templates to organize your job search.",
-              icon: FaDownload, // Changed icon and description
+              icon: FaDownload,
             },
           ].map((feature, index) => (
             <motion.div
@@ -136,6 +212,65 @@ function Home({ session }) {
                 {feature.title}
               </h4>
               <p className="mt-3 text-gray-600">{feature.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 relative z-10">
+        <h3 className="text-4xl font-bold text-gray-900 text-center">
+          What Our Users Say
+        </h3>
+        <p className="mt-4 text-lg text-gray-700 text-center max-w-3xl mx-auto">
+          Hear from professionals who transformed their job search with
+          ResumeCraft.
+        </p>
+        <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              name: "Chinedu Okeke",
+              role: "Software Engineer",
+              quote:
+                "ResumeCraft helped me land my dream job at a tech startup in Lagos. The AI suggestions were spot-on!",
+              rating: 5,
+            },
+            {
+              name: "Aisha Bello",
+              role: "Marketing Manager",
+              quote:
+                "The templates are professional and easy to customize. I got interview calls within days!",
+              rating: 4,
+            },
+            {
+              name: "Tunde Adeyemi",
+              role: "Financial Analyst",
+              quote:
+                "The cover letter builder saved me hours, and the ATS optimization really made a difference.",
+              rating: 5,
+            },
+          ].map((testimonial, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.2,
+                ease: "easeOut",
+              }}
+              className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition border border-gray-100"
+            >
+              <div className="flex items-center mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <FaStar key={i} className="text-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-600 italic">"{testimonial.quote}"</p>
+              <p className="mt-4 font-semibold text-gray-900">
+                {testimonial.name}
+              </p>
+              <p className="text-gray-500">{testimonial.role}</p>
             </motion.div>
           ))}
         </div>
@@ -213,7 +348,9 @@ function Home({ session }) {
                 </ul>
                 <Link
                   to={plan.link}
-                  className="mt-8 w-full inline-flex justify-center px-6 py-3 text-lg font-semibold rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition transform hover:scale-105"
+                  className="mt
+
+-8 w-full inline-flex justify-center px-6 py-3 text-lg font-semibold rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition transform hover:scale-105"
                 >
                   Choose {plan.title}
                 </Link>
@@ -224,24 +361,75 @@ function Home({ session }) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-indigo-800 to-purple-800 py-8 relative z-10">
+      <footer className="bg-gradient-to-r from-indigo-800 to-purple-800 py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-lg text-white text-center">
-            © 2025 ResumeCraft. All rights reserved.
-          </p>
-          <div className="mt-4 flex justify-center space-x-6">
-            <a href="#" className="text-white hover:text-indigo-300 transition">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-white hover:text-indigo-300 transition">
-              Terms of Service
-            </a>
-            <a
-              href="mailto:support@resumecraft.com"
-              className="text-white hover:text-indigo-300 transition"
-            >
-              Contact Us
-            </a>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-2xl font-bold text-white">ResumeCraft</h3>
+              <p className="mt-4 text-gray-300">
+                Empowering Nigerian professionals with AI-driven tools to create
+                standout resumes and cover letters.
+              </p>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-white">Quick Links</h4>
+              <ul className="mt-4 space-y-2">
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-300 hover:text-white transition"
+                  >
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-gray-300 hover:text-white transition"
+                  >
+                    Terms of Service
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="mailto:support@resumecraft.com"
+                    className="text-gray-300 hover:text-white transition"
+                  >
+                    Contact Us
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-lg font-semibold text-white">
+                Connect With Us
+              </h4>
+              <div className="mt-4 flex space-x-4">
+                <a
+                  href="https://twitter.com"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  <FaTwitter className="text-2xl" />
+                </a>
+                <a
+                  href="https://linkedin.com"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  <FaLinkedin className="text-2xl" />
+                </a>
+                <a
+                  href="https://github.com"
+                  className="text-gray-300 hover:text-white transition"
+                >
+                  <FaGithub className="text-2xl" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-indigo-600 pt-6">
+            <p className="text-center text-gray-300">
+              © 2025 ResumeCraft. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
