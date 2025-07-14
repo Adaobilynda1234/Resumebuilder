@@ -244,15 +244,6 @@ function Home({ session }) {
         <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
           Create Standout
           <br />
-          <span className="relative">
-            Resumes & Cover Letters
-            <motion.div
-              className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-full h-3 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full opacity-30"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1, delay: 1 }}
-            />
-          </span>
         </h2>
 
         <motion.p
@@ -459,36 +450,6 @@ function Home({ session }) {
                 rating: 5,
                 avatar: "TA",
                 company: "FinanceHub",
-              },
-              {
-                name: "Ngozi Okafor",
-                role: "HR Director at PeopleFirst",
-                location: "Enugu, Nigeria",
-                quote:
-                  "As an HR professional, I can tell when a resume was created with ResumeCraft. The quality is outstanding and candidates clearly stand out. I now recommend it to all job seekers.",
-                rating: 5,
-                avatar: "NO",
-                company: "PeopleFirst",
-              },
-              {
-                name: "Ibrahim Musa",
-                role: "Data Scientist at DataLab",
-                location: "Kano, Nigeria",
-                quote:
-                  "The industry-specific templates for tech roles are spot-on. ResumeCraft understood exactly what recruiters in my field are looking for. I doubled my interview rate after switching to their platform.",
-                rating: 5,
-                avatar: "IM",
-                company: "DataLab",
-              },
-              {
-                name: "Grace Emeka",
-                role: "Business Analyst at ConsultPro",
-                location: "Calabar, Nigeria",
-                quote:
-                  "The collaboration feature allowed my mentor to review my resume in real-time. The feedback integration made the improvement process so much smoother. Worth every naira!",
-                rating: 5,
-                avatar: "GE",
-                company: "ConsultPro",
               },
             ].map((testimonial, index) => (
               <motion.div
