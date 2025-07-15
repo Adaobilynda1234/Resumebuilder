@@ -853,7 +853,7 @@ function Home({ session }) {
               </div>
               <div className="flex items-center">
                 <FaPhone className="text-indigo-400 mr-3" />
-                <span className="text-gray-300">+234 800 123 4567</span>
+                <span className="text-gray-300">+234 807 123 4567</span>
               </div>
               <div className="flex items-center">
                 <FaGlobe className="text-indigo-400 mr-3" />
