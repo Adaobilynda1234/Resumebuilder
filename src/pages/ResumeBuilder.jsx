@@ -62,12 +62,15 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 28,
+    padding: 10,
     fontWeight: "bold",
     marginBottom: 5,
   },
   title: {
     fontSize: 18,
     marginBottom: 10,
+
+    padding: 10,
     color: "#444444",
   },
   contact: {
@@ -261,37 +264,70 @@ function ResumeBuilder({ session }) {
       return;
     }
 
-    // Enhanced AI generation with section-specific content
+    // Enhanced AI generation with context-awareness
     let enhancedContent = "";
     const prompt = section.aiPrompt.trim();
+    const { name, title } = resume;
 
+    // Context-aware generation based on section type
     switch (section.title.toLowerCase()) {
       case "education":
-        enhancedContent = `• ${prompt} with honors\n• Relevant coursework: Advanced ${
-          prompt.split(" ")[0] || "Subjects"
-        }\n• GPA: 3.8/4.0\n• Thesis: "Advanced Techniques in ${prompt}"`;
+        enhancedContent =
+          `• ${name ? `${name} obtained ` : ""}a ${
+            prompt.includes("degree") ? "" : "degree in "
+          }${prompt} from a prestigious institution\n` +
+          `• Graduated with honors and completed relevant coursework in ${
+            prompt.split(" ")[0] || "related fields"
+          }\n` +
+          `• Thesis/dissertation: "Advanced Applications of ${
+            prompt.split(" ")[0] || "Specialized"
+          } Techniques"`;
         break;
       case "experience":
-        enhancedContent = `• ${prompt} - Developed and implemented new strategies\n• Managed team of 5 ${
-          prompt.split(" ")[0] || "specialists"
-        }\n• Increased efficiency by 25% through ${prompt}`;
+        enhancedContent =
+          `• ${title ? `As a ${title}, ` : ""}${name || "The candidate"} ${
+            prompt.includes("led") ? "" : "spearheaded "
+          }${prompt} initiatives\n` +
+          `• Managed cross-functional teams and increased operational efficiency by 30%\n` +
+          `• Developed innovative solutions resulting in ${
+            Math.floor(Math.random() * 20) + 10
+          }% cost savings\n` +
+          `• Collaborated with stakeholders to achieve project milestones ahead of schedule`;
         break;
       case "skills":
-        enhancedContent = `• ${prompt}\n• ${
-          prompt.split(" ")[0] || "Advanced"
-        } Frameworks\n• ${
-          prompt.split(" ")[0] || "Industry"
-        } Best Practices\n• ${
-          prompt.split(" ")[0] || "Technical"
-        } Problem Solving`;
+        enhancedContent =
+          `• ${prompt}\n` +
+          `• Advanced ${prompt.split(" ")[0] || "Technical"} Frameworks\n` +
+          `• ${
+            prompt.split(" ")[0] || "Industry"
+          } Best Practices & Methodologies\n` +
+          `• ${prompt.split(" ")[0] || "Cross-functional"} Collaboration\n` +
+          `• ${
+            prompt.split(" ")[0] || "Technical"
+          } Problem Solving & Troubleshooting`;
         break;
       case "achievements":
-        enhancedContent = `• Awarded for excellence in ${prompt}\n• Published research on ${prompt}\n• Led successful ${
-          prompt.split(" ")[0] || "project"
-        } initiative\n• Recognized as top performer in ${prompt}`;
+        enhancedContent =
+          `• Recognized as ${
+            prompt.includes("Top") ? "" : "Top Performer in "
+          }${prompt} (${new Date().getFullYear() - 1})\n` +
+          `• Received industry award for excellence in ${
+            prompt.split(" ")[0] || "specialized"
+          } field\n` +
+          `• Published research on ${prompt} in peer-reviewed journal\n` +
+          `• Led team that won ${
+            prompt.includes("award") ? "" : "innovation award for "
+          }${prompt}`;
         break;
       default:
-        enhancedContent = `• Leveraged advanced ${prompt} techniques\n• Achieved measurable results in ${prompt}\n• Developed innovative solutions for ${prompt}`;
+        enhancedContent =
+          `• ${name ? `${name} demonstrated ` : ""}expertise in ${prompt}\n` +
+          `• Developed and implemented strategies that improved ${
+            prompt.split(" ")[0] || "key"
+          } metrics by ${Math.floor(Math.random() * 30) + 15}%\n` +
+          `• ${
+            prompt.includes("led") ? "" : "Led initiatives for "
+          }${prompt} resulting in measurable business impact`;
     }
 
     setResume((prev) => ({
@@ -302,7 +338,56 @@ function ResumeBuilder({ session }) {
           : sec
       ),
     }));
-    toast.success("Section enhanced successfully!");
+    toast.success("Section enhanced with AI!");
+  };
+
+  // AI-assisted summary generation
+  const generateAISummary = () => {
+    if (!resume.name || !resume.title) {
+      toast.error("Please enter your name and title first");
+      return;
+    }
+
+    const experienceSection = resume.sections.find(
+      (sec) => sec.title.toLowerCase() === "experience"
+    );
+    const skillsSection = resume.sections.find(
+      (sec) => sec.title.toLowerCase() === "skills"
+    );
+
+    const experienceContent = experienceSection?.content || "";
+    const skillsContent = skillsSection?.content || "";
+
+    // Extract key skills
+    const skillsList = skillsContent
+      .split("\n")
+      .filter((line) => line.trim().startsWith("•"))
+      .map((line) => line.replace("•", "").trim())
+      .slice(0, 5);
+
+    // Create context-aware summary
+    const summary =
+      `${resume.name} is a ${resume.title} with ${
+        experienceContent ? "extensive " : ""
+      }experience in ${resume.title.toLowerCase()}.\n` +
+      `Skilled in ${
+        skillsList.length > 0
+          ? skillsList.join(", ")
+          : "key technical and soft skills"
+      }, ` +
+      `${resume.name} has a proven track record of ${
+        experienceContent
+          ? "delivering results and driving innovation"
+          : "achieving measurable outcomes"
+      }.\n` +
+      `Known for ${
+        skillsList.length > 0
+          ? skillsList[0] + " expertise"
+          : "technical proficiency"
+      } and collaborative approach.`;
+
+    setResume((prev) => ({ ...prev, summary }));
+    toast.success("Professional summary generated!");
   };
 
   const addSection = () => {
@@ -564,10 +649,19 @@ function ResumeBuilder({ session }) {
                 </div>
 
                 <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold mb-4 flex items-center gap-2">
-                    <User size={20} />
-                    Personal Information
-                  </h2>
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-base sm:text-lg md:text-xl font-semibold flex items-center gap-2">
+                      <User size={20} />
+                      Personal Information
+                    </h2>
+                    <button
+                      onClick={generateAISummary}
+                      className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors flex items-center gap-2 text-sm"
+                    >
+                      <Sparkles size={16} />
+                      AI Summary
+                    </button>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <input
                       type="text"
@@ -716,6 +810,9 @@ function ResumeBuilder({ session }) {
                                       />
                                       <span className="text-sm font-medium text-purple-700">
                                         AI Enhancement
+                                      </span>
+                                      <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                                        {section.title}
                                       </span>
                                     </div>
                                     <div className="flex flex-col sm:flex-row gap-2">
