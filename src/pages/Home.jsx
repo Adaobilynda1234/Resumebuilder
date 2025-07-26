@@ -519,7 +519,7 @@ function Home({ session }) {
               </div>
               <div>
                 <div className="text-3xl font-bold text-indigo-600 mb-2">
-                  2,500+
+                  3,500+
                 </div>
                 <div className="text-gray-600">Happy Customers</div>
               </div>
