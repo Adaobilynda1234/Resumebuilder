@@ -253,8 +253,8 @@ function Home({ session }) {
           className="mt-8 text-lg md:text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed"
         >
           Build professional, ATS-optimized documents with AI-powered tools
-          tailored for the Nigerian job market. Join thousands of professionals
-          who landed their dream jobs with ResumeCraft.
+          tailored for the Nigerian job market/other job market. Join thousands
+          of professionals who landed their dream jobs with ResumeCraft.
         </motion.p>
 
         <motion.div
