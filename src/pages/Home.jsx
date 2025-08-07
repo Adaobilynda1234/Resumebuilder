@@ -871,7 +871,7 @@ function Home({ session }) {
               <span className="text-gray-400 text-sm mr-3">Made with</span>
               <FaHeart className="text-red-500 mr-3" />
               <span className="text-gray-400 text-sm">
-                for Nigerian/foreign professionals
+                for all professionals
               </span>
             </div>
           </div>
