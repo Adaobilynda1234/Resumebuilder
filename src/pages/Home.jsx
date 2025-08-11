@@ -242,7 +242,7 @@ function Home({ session }) {
         </motion.div>
 
         <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
-          Create Standout CV and Cover Letters
+          Create Standout CVs and Cover Letters
           <br />
         </h2>
 
