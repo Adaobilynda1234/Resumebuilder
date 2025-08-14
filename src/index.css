@@ -6,6 +6,15 @@ body {
   background-color: #f3f4f6;
 }
 
+/* Force scrollbars to show */
+* {
+  scrollbar-width: auto !important;
+  -ms-overflow-style: auto !important;
+}
+*::-webkit-scrollbar {
+  display: block !important;
+}
+
 @layer utilities {
   .bg-gradient-text {
     background-clip: text;
