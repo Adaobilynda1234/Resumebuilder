@@ -237,7 +237,7 @@ function Home({ session }) {
         >
           <span className="inline-flex items-center px-4 py-2 rounded-full bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-800 font-semibold text-sm mb-6">
             <FaRocket className="mr-2" />
-            Trusted by 500k Professionals
+            Trusted by 1m Professionals
           </span>
         </motion.div>
 
