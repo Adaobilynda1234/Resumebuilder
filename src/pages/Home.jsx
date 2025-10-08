@@ -350,7 +350,7 @@ function Home({ session }) {
             },
             {
               title: "Job Search Templates",
-              desc: "Downloadable templates and trackers to organize and accelerate your job search process.",
+              desc: "Downloadable templates and trackers to organize / accelerate your job search process.",
               icon: FaDownload,
               color: "from-green-400 to-teal-500",
             },
