@@ -362,7 +362,7 @@ function Home({ session }) {
             },
             {
               title: "Real-time Collaboration",
-              desc: "Share and get feedback on your documents from mentors, colleagues,friends,families and career coaches.",
+              desc: "Share and get feedback on your documents from mentors, colleagues,friends and career coaches.",
               icon: FaUsers,
               color: "from-cyan-400 to-blue-500",
             },
