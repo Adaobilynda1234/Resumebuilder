@@ -358,7 +358,7 @@ function Home({ session }) {
               title: "ATS Optimization",
               desc: "Ensure your resume passes through Applicant Tracking Systems with our optimization tools.",
               icon: FaShieldAlt,
-              color: "from-purple-400 to-pink-500",
+              color: "from-purple-400 to-pink-600",
             },
             {
               title: "Real-time Collaboration",
