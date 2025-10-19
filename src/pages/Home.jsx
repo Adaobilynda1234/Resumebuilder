@@ -370,7 +370,7 @@ function Home({ session }) {
               title: "Industry Expertise",
               desc: "Tailored advice and templates for specific Nigerian industries and job roles.",
               icon: FaAward,
-              color: "from-red-400 to-pink-500",
+              color: "from-red-400 to-pink-600",
             },
           ].map((feature, index) => (
             <motion.div
