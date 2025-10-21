@@ -325,7 +325,7 @@ function Home({ session }) {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h3 className="text-4xl md:text-5xl font-bold text-gray-700 mb-6">
+          <h3 className="text-3xl md:text-5xl font-bold text-gray-700 mb-6">
             Why Choose ResumeCraft?
           </h3>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
