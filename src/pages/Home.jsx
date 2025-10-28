@@ -328,7 +328,7 @@ function Home({ session }) {
           <h3 className="text-4xl md:text-5xl font-bold text-gray-700 mb-6">
             Why Choose ResumeCraft?
           </h3>
-          <p className="text-2xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-4xl text-gray-600 max-w-3xl mx-auto">
             Our platform empowers Nigerian professionals with cutting-edge tools
             to succeed in today's competitive job market.
           </p>
